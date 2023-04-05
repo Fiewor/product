@@ -1,0 +1,12 @@
+header {
+  &__button {
+    background: #299abd;
+    color: #fff;
+    margin: 0 0.5rem;
+    padding: 1rem;
+
+    &:hover {
+      background: #1c6880;
+    }
+  }
+}
