@@ -15,9 +15,9 @@ button {
   color: white;
 }
 button:hover {
-  background: #106c88;
+  background: #2a7288;
 }
 button:focus,
 button:focus-visible {
-  background: #1c6880;
+  background: #106c88;
 }

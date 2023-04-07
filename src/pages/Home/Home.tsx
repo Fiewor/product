@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect } from "react";
 import { useGetAllProductsQuery } from "../../services/product";
 import "./home.scss";
 import { allProducts } from "../../features/products/productSlice";
@@ -9,7 +8,6 @@ import ProductList from "../ProductList/ProductList";
 const Home = () => {
   const dispatch = useAppDispatch();
   const { data, error, isLoading } = useGetAllProductsQuery();
-  const { searchInput } = useAppSelector((state) => state.product);
 
   useEffect(() => {
     // if(error) dispatch(allProducts(error))

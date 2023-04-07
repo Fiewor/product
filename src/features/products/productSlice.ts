@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "../../app/store";
-import { product, IProduct } from "../../services/product";
+import { product } from "../../services/product";
 
 export interface INewProduct {
   name: string;
@@ -9,7 +8,7 @@ export interface INewProduct {
   rating: string | number;
 }
 
-interface ProductState {
+interface IProductState {
   searchInput: string;
   productList: product[] | any;
   isError: boolean;
@@ -18,7 +17,7 @@ interface ProductState {
   message: string;
 }
 
-const initialState: ProductState = {
+const initialState: IProductState = {
   searchInput: "",
   productList: [],
   isError: false,
@@ -40,10 +39,15 @@ export const productSlice = createSlice({
     addToProductList: (state, action: PayloadAction<INewProduct>) => {
       state.productList.push(action.payload);
     },
+    deleteProduct: (state, action: PayloadAction<number>) => {
+      state.productList = state.productList.filter(
+        (product: product) => product.id !== action.payload
+      );
+    },
   },
 });
 
-export const { allProducts, setSearchInput, addToProductList } =
+export const { allProducts, setSearchInput, addToProductList, deleteProduct } =
   productSlice.actions;
 
 export default productSlice.reducer;

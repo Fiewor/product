@@ -3,10 +3,14 @@ import { product, useGetAllProductsQuery } from "../../services/product";
 import "./productlist.scss";
 import Table from "../../components/Table/Table";
 import { useSelector } from "react-redux";
+import { useAppSelector, useAppDispatch } from "../../app/hooks";
+import { deleteProduct } from "../../features/products/productSlice";
 
 const ProductList = () => {
   const { searchInput } = useSelector((state: any) => state.product);
   const { data, error, isLoading, isError } = useGetAllProductsQuery();
+  const dispatch = useAppDispatch();
+  const { productList } = useAppSelector((state) => state.product);
 
   const tableData = useMemo(() => {
     if (!data || !data.products) return [];
@@ -18,10 +22,13 @@ const ProductList = () => {
           product.title.toLowerCase().includes(searchInput.toLowerCase()) ||
           product.category.toLowerCase().includes(searchInput.toLowerCase())
       );
+      // if productlist is not empty, return the productlist
+    } else if (productList.length > 0) {
+      return productList;
     } else {
       return data.products;
     }
-  }, [data, searchInput]);
+  } , [data, searchInput, productList]);
 
   const columns = useMemo(
     () => [
@@ -48,11 +55,11 @@ const ProductList = () => {
             id: 4,
             accessor: "price",
             // format price as dollars
-            Cell: ({ cell: { value: number } }) =>
+            Cell: ({ cell: { value } }: {cell: {value: number}}) =>
               new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: "USD",
-              }).format(number),
+              }).format(value),
           },
           {
             Header: "Photo",
@@ -74,6 +81,24 @@ const ProductList = () => {
             id: 8,
             accessor: "category",
           },
+          // add an extra column for the delete button
+          {
+            Header: "Delete Product",
+            id: 9,
+            accessor: "id",
+            Cell: ({ cell: { value } }: {cell: {value: number}}) => (
+              <button
+                className="delete-button"
+                onClick={() => {
+                  console.log(value);
+                  dispatch(deleteProduct(value));
+                }}
+              >
+                Delete
+              </button>
+            ),
+          },
+
         ],
       },
     ],
@@ -86,6 +111,10 @@ const ProductList = () => {
 
   if (isError) {
     return <p>Error</p>;
+  }
+  // if productList is empty, return the table headers with no data
+  if (productList.length === 0) {
+    return <Table columns={columns} data={[]} searchInput={searchInput} />;
   }
 
   return <Table columns={columns} data={tableData} searchInput={searchInput} />;
