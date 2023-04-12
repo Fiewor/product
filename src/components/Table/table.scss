@@ -37,3 +37,11 @@ table th.sort-asc::before {
 table th.sort-desc::before {
   border-top: 5px solid #22543d;
 }
+
+a {
+  text-decoration: none;
+  color: #35b1e2;
+}
+a:hover {
+  color: #2a7592;
+}
