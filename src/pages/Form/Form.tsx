@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -8,8 +8,8 @@ import {
   addToProductList,
   INewProduct,
 } from "../../features/products/productSlice";
-import { product } from "../../services/product";
 import "./form.scss";
+import { useAddProductMutation } from "../../services/product";
 
 const SignUpForm = () => {
   const nav = useNavigate();
@@ -20,11 +20,8 @@ const SignUpForm = () => {
     yearOfPublication: 0,
     rating: 0,
   });
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    nav("/");
-  };
+  const [addProduct, { isLoading, isError, error, isSuccess, data }] =
+    useAddProductMutation();
 
   const formik = useFormik({
     initialValues: {
@@ -41,7 +38,6 @@ const SignUpForm = () => {
         .max(200, "Must be 200 characters or less")
         .required("Required"),
       yearOfPublication: Yup.number()
-        // year must be a valid 4 digit number
         .max(2023, "Must be a valid year")
         .min(0, "Must be a valid year")
         .required("Required"),
@@ -50,19 +46,26 @@ const SignUpForm = () => {
         .lessThan(10, () => "Rating must be less than 10")
         .required("Required"),
     }),
-    onSubmit: (values) => {
-      dispatch(addToProductList(values));
-    },
+    onSubmit: async (values) => await addProduct(values as any),
   });
 
   return (
     <div className="container">
       <>
-        {formik.isSubmitting ? (
-          <h1>Submitting...</h1>
+        {formik.isSubmitting || isLoading ? (
+          <h1 className="container__text">Submitting...</h1>
         ) : formik.submitCount > 0 &&
-          Object.keys(formik.errors).length === 0 ? (
-          nav("/")
+          Object.keys(formik.errors).length === 0 &&
+          formik.isValid &&
+          isError ? (
+          <h1>Oops! An error occurred while submitting</h1>
+        ) : isSuccess && data ? (
+          <>
+            <h1 className="container__text">Success!</h1>
+            {setTimeout(() => {
+              nav("/");
+            }, 2000)}
+          </>
         ) : (
           <>
             <h1>Add new product</h1>
